@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 class ATankGameModeBase;
-
+class APawnBase;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TOONTANKS_API UHealthComponent : public UActorComponent
 {
@@ -15,10 +15,12 @@ class TOONTANKS_API UHealthComponent : public UActorComponent
 private:
 
 	UPROPERTY(EditAnywhere)
-	float DefaultHealth = 200.f;
+	float DefaultHealth;
 
-	float Health = 0.f;
+	float CurruentHealth;
 	ATankGameModeBase* GameModeRef;
+
+	APawnBase* Owner;
 
 public:	
 	// Sets default values for this component's properties

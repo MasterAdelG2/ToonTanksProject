@@ -3,6 +3,7 @@
 
 #include "HealthComponent.h"
 #include "ToonTanks/TankGameModeBase.h"
+#include "ToonTanks/PawnBase.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
@@ -15,7 +16,7 @@ UHealthComponent::UHealthComponent()
 
 float UHealthComponent::GetHealth() const
 {
-	return Health;
+	return CurruentHealth;
 }
 
 float UHealthComponent::GetMaxHealth() const
@@ -30,18 +31,23 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 	GameModeRef = Cast<ATankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::TakeDamage);
-	Health = DefaultHealth;
+	Owner = Cast<APawnBase>(GetOwner());
+	if (Owner)
+	{
+		CurruentHealth = Owner->GetDefaultHealth();
+		DefaultHealth = CurruentHealth;
+	} 
 } 
 
 void UHealthComponent::TakeDamage(AActor* DamageActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser) {
 	
-	if (Damage ==0 || Health <=0)
+	if (Damage ==0 || CurruentHealth <=0)
 	{
 		return;
 	}
-	Health = FMath::Clamp(Health - Damage,0.f,DefaultHealth);
+	CurruentHealth = FMath::Clamp(CurruentHealth - Damage,0.f,DefaultHealth);
 
-	if (Health<=0)
+	if (CurruentHealth<=0)
 	{
 		if (GameModeRef)
 		{

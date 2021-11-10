@@ -10,32 +10,41 @@ class UParticleSystem;
 class UParticleSystemComponent;
 class USoundBase;
 class UMatineeCameraShake;
+class APawnBase;
 UCLASS()
 class TOONTANKS_API AProjectileBase : public AActor
 {
 	GENERATED_BODY()
 	
 private:
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components",meta = (AllowPrivateAccess ="true"))
 	UProjectileMovementComponent* ProjectileMovement;
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components",meta = (AllowPrivateAccess ="true"))
 	UStaticMeshComponent* ProjectileMesh;
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components",meta = (AllowPrivateAccess ="true"))
 	UParticleSystemComponent* ParticleTrail;
 	// VARIABLES
 	UPROPERTY(EditDefaultsOnly,Category="Damage")
 	TSubclassOf<UDamageType> DamageType;
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Move",meta = (AllowPrivateAccess ="true"))
-	float MovementSpeed = 1300.f;
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Damage",meta = (AllowPrivateAccess ="true"))
-	float Damage = 50.f;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Move",meta = (AllowPrivateAccess ="true"))
+	float ProjectileSpeed;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Damage",meta = (AllowPrivateAccess ="true"))
+	float Damage;
 
 	UPROPERTY(EditAnywhere,Category="Effects")
 	UParticleSystem* HitParticle;
+
 	UPROPERTY(EditAnywhere,Category="Effects")
 	USoundBase* HitSound;
+
 	UPROPERTY(EditAnywhere,Category="Effects")
 	USoundBase* LaunchSound;
+
 	UPROPERTY(EditAnywhere,Category="Effects")
 	TSubclassOf<UMatineeCameraShake> HitShake;
 
@@ -45,6 +54,8 @@ private:
 public:	
 	// Sets default values for this actor's properties
 	AProjectileBase();
+
+	void Initialize(APawnBase* Owner,AController* Controller, FVector SpawnLoc);
 
 protected:
 	// Called when the game starts or when spawned

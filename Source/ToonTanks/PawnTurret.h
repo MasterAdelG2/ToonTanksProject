@@ -31,6 +31,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	void RotateCannonTurret(FVector LookAtTarget,float DeltaTime);
 
 };

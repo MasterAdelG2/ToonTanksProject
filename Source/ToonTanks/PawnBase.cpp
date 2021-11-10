@@ -6,6 +6,7 @@
 #include "ToonTanks/ProjectileBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "HealthComponent.h"
+#include "TimerManager.h"
 // Sets default values
 APawnBase::APawnBase()
 {
@@ -34,23 +35,56 @@ void APawnBase::BeginPlay()
 	
 }
 
-void APawnBase::RotateTurret(FVector LookAtTarget) 
+// Redirects turret to get shortest rotation
+/* FRotator ShortestRotation(FRotator Rotator)
+{
+	// For Rotating Right
+	Rotator.Yaw = Rotator.Yaw > 180 ? Rotator.Yaw-360: Rotator.Yaw;
+	Rotator.Pitch = Rotator.Pitch > 180 ? Rotator.Pitch-360: Rotator.Pitch;
+	Rotator.Roll = Rotator.Roll > 180 ? Rotator.Roll-360: Rotator.Roll;
+	// For Rotating Left
+	Rotator.Yaw = Rotator.Yaw < -180 ? Rotator.Yaw+360: Rotator.Yaw;
+	Rotator.Pitch = Rotator.Pitch < -180 ? Rotator.Pitch+360: Rotator.Pitch;
+	Rotator.Roll = Rotator.Roll < -180 ? Rotator.Roll+360: Rotator.Roll;
+
+	return Rotator;
+} */
+
+
+
+// For Targetting by Mouse
+/* void APawnBase::RotateTurret(FVector LookAtTarget,float DeltaTime) 
 {
 	FVector LookAtTargetCleaned = FVector(LookAtTarget.X,LookAtTarget.Y,TurretMesh->GetComponentLocation().Z);
-	FVector StartLocation = TurretMesh->GetComponentLocation();
-	FRotator TurretRotation = FVector(LookAtTargetCleaned - StartLocation).Rotation();
-	TurretMesh->SetWorldRotation(TurretRotation);
-}
+	FVector TurretLocation = TurretMesh->GetComponentLocation();
+	FRotator TurretRotation = TurretMesh->GetComponentRotation();
+	FRotator EndRotation = FVector(LookAtTargetCleaned - TurretLocation).Rotation();
+	
+	FRotator TurretNeeded = ShortestRotation(EndRotation-TurretRotation) * DeltaTime * RotateTurretSpeed;
+	TurretMesh->AddWorldRotation(TurretNeeded);
+} */
 
 void APawnBase::Fire() 
 {
-	if (ProjectileClass)
+	if (ProjectileClass && !Reloading)
 	{
 		FVector SpawnLoc = ProjectileSpawnPoint->GetComponentLocation();
 		FRotator SpawnRot = ProjectileSpawnPoint->GetComponentRotation();
-		AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass,SpawnLoc,SpawnRot);
-		TempProjectile->SetOwner(this);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass,SpawnLoc,SpawnRot,SpawnParams); 
+		//TempProjectile->Initialize(this,GetController(),SpawnLoc);
+		//TempProjectile->SetOwner(this);
+
+		Reloading = true;
+		FTimerHandle UnusedHandle;
+ 		GetWorldTimerManager().SetTimer(UnusedHandle, this, &APawnBase::FinishedReloading, ReloadDelay, false);
 	}
+}
+
+void APawnBase::FinishedReloading()
+{
+	Reloading = false;
 }
 
 void APawnBase::HandleDestruction() 

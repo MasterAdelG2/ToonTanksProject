@@ -40,15 +40,9 @@ bool APawnTank::GetIsPlayerAlive()
 void APawnTank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-    Rotate();
-    Move();
-    if (PlayerControllerRef)
-    {
-        FHitResult TraceHitResult;
-        PlayerControllerRef->GetHitResultUnderCursor(ECC_Visibility,false,TraceHitResult);
-        FVector HitLocation = TraceHitResult.ImpactPoint;
-        RotateTurret(HitLocation);
-    }
+    Turn(DeltaTime);
+    Move(DeltaTime);
+    RotateTankTurret(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -56,28 +50,40 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
     PlayerInputComponent->BindAxis("MoveForward",this,&APawnTank::CalculateMoveInput);
-    PlayerInputComponent->BindAxis("Turn",this,&APawnTank::CalculateRotateInput);
+    PlayerInputComponent->BindAxis("Turn",this,&APawnTank::CalculateTurnInput);
     PlayerInputComponent->BindAction("Fire",IE_Pressed,this,&APawnTank::Fire);
+    PlayerInputComponent->BindAxis("RotateTurret",this,&APawnTank::CalculateRotateTurretInput);
 }
 
 void APawnTank::CalculateMoveInput(float Value) 
 {
-    MoveDirection = FVector(Value*MoveSpeed*GetWorld()->DeltaTimeSeconds,0,0 );
+    MoveThrottle = Value;
 }
 
-void APawnTank::CalculateRotateInput(float Value) 
+void APawnTank::CalculateTurnInput(float Value) 
 {
-    float RotateAmount = Value * RotateSpeed * GetWorld()->DeltaTimeSeconds;
-    FRotator Rotation = FRotator(0,RotateAmount,0);
-    RotationDirection = FQuat(Rotation);
+    TurnTankThrottle = Value;
 }
 
-void APawnTank::Move() 
+void APawnTank::CalculateRotateTurretInput(float Value) 
 {
-    AddActorLocalOffset(MoveDirection,true);
+    RotateTurretThrottle = Value;
 }
 
-void APawnTank::Rotate() 
+void APawnTank::Move(float DeltaTime) 
 {
-    AddActorLocalRotation(RotationDirection,true);
+    FVector AddedDirection = FVector(MoveThrottle*MoveSpeed*DeltaTime,0,0 );
+    AddActorLocalOffset(AddedDirection,true);
+}
+
+void APawnTank::Turn(float DeltaTime) 
+{
+    FQuat AddedTurnDirection = FQuat(FRotator(0,TurnTankThrottle * RotateTankSpeed * DeltaTime,0));
+    AddActorWorldRotation(AddedTurnDirection,true);
+}
+
+void APawnTank::RotateTankTurret(float DeltaTime)
+{
+    FQuat AddedTurretDirection = FQuat(FRotator(0,RotateTurretThrottle * RotateTurretSpeed * DeltaTime,0));
+    TurretMesh->AddWorldRotation(AddedTurretDirection,true);
 }

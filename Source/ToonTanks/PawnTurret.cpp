@@ -28,8 +28,17 @@ void APawnTurret::Tick(float DeltaTime)
     {
         return;
     }
-    RotateTurret(PlayerPawn->GetActorLocation());
+    RotateCannonTurret(PlayerPawn->GetActorLocation(),DeltaTime);
 }
+
+void APawnTurret::RotateCannonTurret(FVector LookAtTarget,float DeltaTime) 
+{
+	FVector LookAtTargetCleaned = FVector(LookAtTarget.X,LookAtTarget.Y,TurretMesh->GetComponentLocation().Z);
+	FVector StartLocation = TurretMesh->GetComponentLocation();
+	FRotator TurretRotation = FVector(LookAtTargetCleaned - StartLocation).Rotation();
+	TurretMesh->SetWorldRotation(TurretRotation);
+}
+
 void APawnTurret::CheckFireCondition() 
 {
 

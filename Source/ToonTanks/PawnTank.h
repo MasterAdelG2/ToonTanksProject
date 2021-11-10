@@ -21,24 +21,24 @@ private:
 	UCameraComponent* Camera;
 
 
-	FVector MoveDirection;
-
-	FQuat RotationDirection;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement",meta = (AllowPrivateAccess="true"));
-	float MoveSpeed=100.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement",meta = (AllowPrivateAccess="true"));
-	float RotateSpeed=100.f;
+	float MoveThrottle;
+	float RotateTurretThrottle;
+	float TurnTankThrottle;
 
 	APlayerController* PlayerControllerRef;
 	bool bIsPlayerAlive = true;
 
 	void CalculateMoveInput(float Value);
 
-	void CalculateRotateInput(float Value);
+	void CalculateTurnInput(float Value);
 
-	void Move();
+	void CalculateRotateTurretInput(float Value);
 
-	void Rotate();
+	void Move(float DeltaTime);
+
+	void Turn(float DeltaTime);
+
+	void RotateTankTurret(float DeltaTime);
 
 public:
 	// Sets default values for this pawn's properties

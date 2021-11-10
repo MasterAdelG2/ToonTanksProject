@@ -21,9 +21,7 @@ AProjectileBase::AProjectileBase()
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	InitialLifeSpan = 3.f;
-
-	ProjectileMovement->InitialSpeed = MovementSpeed;
-	ProjectileMovement->MaxSpeed = MovementSpeed;
+	ProjectileMovement->UpdatedComponent = ProjectileMesh;
 }
 
 // Called when the game starts or when spawned
@@ -32,14 +30,14 @@ void AProjectileBase::BeginPlay()
 	Super::BeginPlay();
 	UGameplayStatics::PlaySoundAtLocation(this,LaunchSound,GetActorLocation());
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectileBase::OnHit);
-	ProjectileMovement->InitialSpeed = MovementSpeed;
-	ProjectileMovement->MaxSpeed = MovementSpeed;
+	ProjectileMovement->InitialSpeed = ProjectileSpeed;
+	ProjectileMovement->MaxSpeed = ProjectileSpeed;
 }
 
 void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) 
 {
 	// Try to get a reference to the owning class.
-	AActor* MyOwner = GetOwner();
+	APawn* MyOwner = Cast<APawn>(GetOwner());
 	// If for some reason we can't get a valid reference, return as we need to check against the owner. 
 	if(!MyOwner)
 	{
@@ -52,7 +50,9 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 		UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwner->GetInstigatorController(), this, DamageType);
 		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle,GetActorLocation());
 		UGameplayStatics::PlaySoundAtLocation(this,HitSound,GetActorLocation());
-		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(HitShake);
+		APlayerController* PController = GetGameInstance()->GetFirstLocalPlayerController();
+		if (PController)
+			PController->ClientStartCameraShake(HitShake);
 	}
 	Destroy();
 }
