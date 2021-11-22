@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "HealthComponent.h"
 #include "TimerManager.h"
+#include "Net/UnrealNetwork.h"
 // Sets default values
 APawnBase::APawnBase()
 {
@@ -35,36 +36,12 @@ void APawnBase::BeginPlay()
 	
 }
 
-// Redirects turret to get shortest rotation
-/* FRotator ShortestRotation(FRotator Rotator)
+/* void APawnBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
-	// For Rotating Right
-	Rotator.Yaw = Rotator.Yaw > 180 ? Rotator.Yaw-360: Rotator.Yaw;
-	Rotator.Pitch = Rotator.Pitch > 180 ? Rotator.Pitch-360: Rotator.Pitch;
-	Rotator.Roll = Rotator.Roll > 180 ? Rotator.Roll-360: Rotator.Roll;
-	// For Rotating Left
-	Rotator.Yaw = Rotator.Yaw < -180 ? Rotator.Yaw+360: Rotator.Yaw;
-	Rotator.Pitch = Rotator.Pitch < -180 ? Rotator.Pitch+360: Rotator.Pitch;
-	Rotator.Roll = Rotator.Roll < -180 ? Rotator.Roll+360: Rotator.Roll;
-
-	return Rotator;
+	DOREPLIFETIME(APawnBase, DefaultHealth); 
 } */
 
-
-
-// For Targetting by Mouse
-/* void APawnBase::RotateTurret(FVector LookAtTarget,float DeltaTime) 
-{
-	FVector LookAtTargetCleaned = FVector(LookAtTarget.X,LookAtTarget.Y,TurretMesh->GetComponentLocation().Z);
-	FVector TurretLocation = TurretMesh->GetComponentLocation();
-	FRotator TurretRotation = TurretMesh->GetComponentRotation();
-	FRotator EndRotation = FVector(LookAtTargetCleaned - TurretLocation).Rotation();
-	
-	FRotator TurretNeeded = ShortestRotation(EndRotation-TurretRotation) * DeltaTime * RotateTurretSpeed;
-	TurretMesh->AddWorldRotation(TurretNeeded);
-} */
-
-void APawnBase::Fire() 
+void APawnBase::Fire_Implementation() 
 {
 	if (ProjectileClass && !Reloading)
 	{

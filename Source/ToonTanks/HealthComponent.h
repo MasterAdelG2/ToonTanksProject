@@ -14,9 +14,9 @@ class TOONTANKS_API UHealthComponent : public UActorComponent
 
 private:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Replicated)
 	float DefaultHealth;
-
+	UPROPERTY(Replicated)
 	float CurruentHealth;
 	ATankGameModeBase* GameModeRef;
 
@@ -34,6 +34,6 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	UFUNCTION()
+	UFUNCTION(Server, Reliable)
 	void TakeDamage(AActor* DamageActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 };

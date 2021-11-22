@@ -20,9 +20,11 @@ private:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category ="Components",meta=(AllowPrivateAccess="true"))
 	UCameraComponent* Camera;
 
-
+	
 	float MoveThrottle;
+	
 	float RotateTurretThrottle;
+	
 	float TurnTankThrottle;
 
 	APlayerController* PlayerControllerRef;
@@ -34,15 +36,27 @@ private:
 
 	void CalculateRotateTurretInput(float Value);
 
-	void Move(float DeltaTime);
+	UFUNCTION(Server, Reliable)
+	void Server_CalculateMoveInput(float Value);
+	UFUNCTION(Server, Reliable)
+	void Server_CalculateTurnInput(float Value);
+	UFUNCTION(Server, Reliable)
+	void Server_CalculateRotateTurretInput(float Value);
 
-	void Turn(float DeltaTime);
+	void ApplyMovement(float DeltaTime);
 
-	void RotateTankTurret(float DeltaTime);
+	UPROPERTY(Replicated)
+	FTransform TankNewTransform;
+	
+/* 	void ApplyMove(float DeltaTime);
+	
+	void ApplyTurn(float DeltaTime);
+	
+	void ApplyRotateTankTurret(float DeltaTime); */
 
 public:
 	// Sets default values for this pawn's properties
-	APawnTank();	
+	APawnTank();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

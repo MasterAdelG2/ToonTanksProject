@@ -22,6 +22,8 @@ AProjectileBase::AProjectileBase()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	InitialLifeSpan = 3.f;
 	ProjectileMovement->UpdatedComponent = ProjectileMesh;
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned

@@ -37,7 +37,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
+	UFUNCTION(Server, Reliable)
 	void Fire();
+
 	bool Reloading=false;
 
 	UPROPERTY(EditAnywhere)

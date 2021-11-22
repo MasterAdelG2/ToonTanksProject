@@ -6,6 +6,7 @@
 #include "PawnTurret.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerControllerBase.h"
+#include "TimerManager.h"
 
 void ATankGameModeBase::HandleGameStart() 
 {
@@ -18,10 +19,8 @@ void ATankGameModeBase::HandleGameStart()
         PlayerControllerRef->SetPlayerEnabledState(false);
         FTimerHandle PlayerEnableHandle;
         FTimerDelegate PlayerEnableDelegate = 
-        FTimerDelegate::CreateUObject(PlayerControllerRef,
-        &APlayerControllerBase::SetPlayerEnabledState,true);
-        GetWorld()->GetTimerManager().SetTimer(PlayerEnableHandle,PlayerEnableDelegate
-            ,StartDelay, false);
+        FTimerDelegate::CreateUObject(PlayerControllerRef,&APlayerControllerBase::SetPlayerEnabledState,true);
+        GetWorld()->GetTimerManager().SetTimer(PlayerEnableHandle, PlayerEnableDelegate, StartDelay, false);
     }
 }
 
@@ -56,7 +55,7 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
 void ATankGameModeBase::BeginPlay() 
 {
     Super::BeginPlay();
-    HandleGameStart();
+    //HandleGameStart();
 }
 
 int32 ATankGameModeBase::GetTargetTurretCount() 
